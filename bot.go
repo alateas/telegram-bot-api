@@ -37,16 +37,25 @@ func NewBotAPI(token string) (*BotAPI, error) {
 	return NewBotAPIWithClient(token, &http.Client{})
 }
 
+func NewBotAPIWithUrl(token string, api_url string) (*BotAPI, error) {
+	return NewBotAPIWithClientWithUrl(token, &http.Client{}, api_url)
+}
+
 // NewBotAPIWithClient creates a new BotAPI instance
 // and allows you to pass a http.Client.
 //
 // It requires a token, provided by @BotFather on Telegram.
 func NewBotAPIWithClient(token string, client *http.Client) (*BotAPI, error) {
+	return NewBotAPIWithClientWithUrl(token, client, "https://api.telegram.org/bot%s/%s")
+}
+
+func NewBotAPIWithClientWithUrl(token string, client *http.Client, api_url string) (*BotAPI, error) {
 	bot := &BotAPI{
 		Token:  token,
 		Client: client,
 		Buffer: 100,
 		shutdownChannel: make(chan interface{}),
+		APIEndpoint: "https://api.telegram.org/bot%s/%s"
 	}
 
 	self, err := bot.GetMe()
@@ -61,7 +70,7 @@ func NewBotAPIWithClient(token string, client *http.Client) (*BotAPI, error) {
 
 // MakeRequest makes a request to a specific endpoint with our token.
 func (bot *BotAPI) MakeRequest(endpoint string, params url.Values) (APIResponse, error) {
-	method := fmt.Sprintf(APIEndpoint, bot.Token, endpoint)
+	method := fmt.Sprintf(bot.APIEndpoint, bot.Token, endpoint)
 
 	resp, err := bot.Client.PostForm(method, params)
 	if err != nil {
@@ -186,7 +195,7 @@ func (bot *BotAPI) UploadFile(endpoint string, params map[string]string, fieldna
 		return APIResponse{}, errors.New(ErrBadFileType)
 	}
 
-	method := fmt.Sprintf(APIEndpoint, bot.Token, endpoint)
+	method := fmt.Sprintf(bot.APIEndpoint, bot.Token, endpoint)
 
 	req, err := http.NewRequest("POST", method, nil)
 	if err != nil {
