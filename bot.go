@@ -28,6 +28,7 @@ type BotAPI struct {
 	Self   User         `json:"-"`
 	Client *http.Client `json:"-"`
 	shutdownChannel chan interface{}
+	APIEndpoint string
 }
 
 // NewBotAPI creates a new BotAPI instance.
