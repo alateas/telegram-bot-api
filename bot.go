@@ -56,7 +56,7 @@ func NewBotAPIWithClientWithUrl(token string, client *http.Client, api_url strin
 		Client: client,
 		Buffer: 100,
 		shutdownChannel: make(chan interface{}),
-		APIEndpoint: "https://api.telegram.org/bot%s/%s",
+		APIEndpoint: api_url,
 	}
 
 	self, err := bot.GetMe()
